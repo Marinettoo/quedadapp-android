@@ -1,0 +1,47 @@
+<!-- Balón lineal en negro, centrado en el área segura (66dp de un
+     viewport de 108dp) del icono adaptativo — mismo espíritu que
+     BallMark.tsx en la web, simplificado para un icono pequeño. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:pathData="M54,21 A33,33 0 1,0 54,87 A33,33 0 1,0 54,21 Z"
+        android:strokeColor="#000000"
+        android:strokeWidth="3"
+        android:fillColor="#00000000" />
+
+    <path
+        android:pathData="M54,37.5 L68.4,47.9 L63,64.7 L45,64.7 L39.6,47.9 Z"
+        android:strokeColor="#000000"
+        android:strokeWidth="3"
+        android:fillColor="#00000000" />
+
+    <path
+        android:pathData="M54,37.5 L54,24"
+        android:strokeColor="#000000"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M68.4,47.9 L82.5,42"
+        android:strokeColor="#000000"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M63,64.7 L71.7,78.3"
+        android:strokeColor="#000000"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M45,64.7 L36.3,78.3"
+        android:strokeColor="#000000"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M39.6,47.9 L25.5,42"
+        android:strokeColor="#000000"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+</vector>
