@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.quedadapp.app.data.Usuario
+import com.quedadapp.app.ui.comunes.BalonGirando
 import com.quedadapp.app.ui.comunes.BotonPrincipal
 import com.quedadapp.app.ui.theme.Ink
 import com.quedadapp.app.ui.theme.Lime
@@ -72,6 +74,14 @@ fun LoginScreen(
                 .background(Lime),
             contentAlignment = Alignment.BottomStart,
         ) {
+            BalonGirando(
+                color = Ink,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 40.dp, y = 40.dp)
+                    .size(180.dp),
+            )
+
             Column(
                 modifier = Modifier
                     .padding(24.dp)
