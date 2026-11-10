@@ -20,12 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quedadapp.app.data.AuthRepository
+import com.quedadapp.app.data.PartidosRepository
 import com.quedadapp.app.data.Usuario
 import com.quedadapp.app.ui.comunes.ViewModelFactory
 import com.quedadapp.app.ui.home.HomeScreen
 import com.quedadapp.app.ui.home.HomeViewModel
 import com.quedadapp.app.ui.login.LoginScreen
 import com.quedadapp.app.ui.login.LoginViewModel
+import com.quedadapp.app.ui.partidos.PartidosViewModel
 import com.quedadapp.app.ui.registro.RegistroEnviadoScreen
 import com.quedadapp.app.ui.registro.RegistroScreen
 import com.quedadapp.app.ui.registro.RegistroViewModel
@@ -44,7 +46,7 @@ private sealed interface PantallaRaiz {
 }
 
 @Composable
-fun AppRoot(authRepository: AuthRepository) {
+fun AppRoot(authRepository: AuthRepository, partidosRepository: PartidosRepository) {
     var pantalla by remember { mutableStateOf<PantallaRaiz>(PantallaRaiz.Cargando) }
 
     // Al abrir la app: si hay un token guardado y sigue siendo válido,
@@ -54,7 +56,7 @@ fun AppRoot(authRepository: AuthRepository) {
         pantalla = if (usuario != null) PantallaRaiz.Inicio(usuario) else PantallaRaiz.Login
     }
 
-    val factory = remember { ViewModelFactory(authRepository) }
+    val factory = remember { ViewModelFactory(authRepository, partidosRepository) }
 
     // Un deslizamiento + desvanecido entre pantallas en vez de un corte
     // seco: la que entra viene desde la derecha, la que sale se desliza
@@ -92,9 +94,11 @@ fun AppRoot(authRepository: AuthRepository) {
 
             is PantallaRaiz.Inicio -> {
                 val viewModel: HomeViewModel = viewModel(factory = factory)
+                val partidosViewModel: PartidosViewModel = viewModel(factory = factory)
                 HomeScreen(
                     usuario = pantallaActual.usuario,
                     viewModel = viewModel,
+                    partidosViewModel = partidosViewModel,
                     onSesionCerrada = { pantalla = PantallaRaiz.Login },
                 )
             }

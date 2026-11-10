@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.weight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -22,30 +23,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.quedadapp.app.data.Usuario
+import com.quedadapp.app.ui.partidos.PartidosScreen
+import com.quedadapp.app.ui.partidos.PartidosViewModel
 import com.quedadapp.app.ui.theme.Ink
 import com.quedadapp.app.ui.theme.Meta
 import kotlinx.coroutines.delay
 
-// Pantalla de inicio todavía mínima: solo confirma que el login y la
-// sesión guardada funcionan de punta a punta. El resto (próximos
-// partidos, asistencia, pagos...) se añade en los siguientes bloques,
-// reutilizando esta misma base de red y sesión.
+// Saludo + próximos partidos (de verdad, contra la API) + cerrar
+// sesión. El resto (equipos, pagos, votaciones, apuestas,
+// estadísticas...) se añade en los siguientes bloques.
 @Composable
 fun HomeScreen(
     usuario: Usuario,
     viewModel: HomeViewModel,
+    partidosViewModel: PartidosViewModel,
     onSesionCerrada: () -> Unit,
 ) {
-    // Entrada escalonada: el saludo, luego el texto y luego el botón,
+    // Entrada escalonada: el saludo, luego la lista y luego el botón,
     // cada uno un poco después del anterior, en vez de que aparezca
     // todo el bloque de golpe.
     var mostrarSaludo by remember { mutableStateOf(false) }
-    var mostrarTexto by remember { mutableStateOf(false) }
+    var mostrarLista by remember { mutableStateOf(false) }
     var mostrarBoton by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         mostrarSaludo = true
         delay(90)
-        mostrarTexto = true
+        mostrarLista = true
         delay(90)
         mostrarBoton = true
     }
@@ -65,16 +68,12 @@ fun HomeScreen(
             }
         }
 
-        Spacer(Modifier.height(32.dp))
-        AnimatedVisibility(visible = mostrarTexto, enter = entrada) {
-            Text(
-                "Próximos partidos, asistencia, equipos y pagos llegarán en próximas versiones.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Meta,
-            )
+        Spacer(Modifier.height(24.dp))
+        AnimatedVisibility(visible = mostrarLista, enter = entrada, modifier = Modifier.weight(1f)) {
+            PartidosScreen(viewModel = partidosViewModel)
         }
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(16.dp))
         AnimatedVisibility(visible = mostrarBoton, enter = entrada) {
             TextButton(
                 onClick = { viewModel.cerrarSesion(onSesionCerrada) },

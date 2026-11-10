@@ -16,12 +16,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val authRepository = (application as QuedadappApp).authRepository
+        val app = application as QuedadappApp
 
         setContent {
             QuedadappTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = Paper) {
-                    AppRoot(authRepository)
+                    AppRoot(app.authRepository, app.partidosRepository)
                 }
             }
         }
