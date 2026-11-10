@@ -18,12 +18,13 @@ android {
     }
 
     buildTypes {
-        // Contra el servidor de desarrollo de Next.js en el PC, desde el
-        // emulador (10.0.2.2 es el alias del emulador para "localhost del
-        // host"). Cambiar por la IP de la máquina si se prueba en un
-        // móvil físico en la misma red.
+        // El servidor de desarrollo (npm run dev) corre en el Mac, no en
+        // esta torre Windows, así que 10.0.2.2 (alias del emulador para
+        // "el propio localhost de la máquina del emulador") no sirve
+        // aquí: hay que apuntar a la IP del Mac en la red local. Si esa
+        // IP cambia (otra red/Wi-Fi), hay que actualizarla.
         debug {
-            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:3000/\"")
+            buildConfigField("String", "API_BASE_URL", "\"http://192.168.1.26:3000/\"")
         }
         release {
             buildConfigField("String", "API_BASE_URL", "\"https://furbo.marinettoo.es/\"")
