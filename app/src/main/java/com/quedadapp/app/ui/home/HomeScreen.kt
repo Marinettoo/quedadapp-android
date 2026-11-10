@@ -25,27 +25,36 @@ import androidx.compose.ui.unit.dp
 import com.quedadapp.app.data.Usuario
 import com.quedadapp.app.ui.partidos.EquiposScreen
 import com.quedadapp.app.ui.partidos.EquiposViewModel
+import com.quedadapp.app.ui.partidos.PagosScreen
+import com.quedadapp.app.ui.partidos.PagosViewModel
 import com.quedadapp.app.ui.partidos.PartidosScreen
 import com.quedadapp.app.ui.partidos.PartidosViewModel
 import com.quedadapp.app.ui.theme.Ink
 import com.quedadapp.app.ui.theme.Meta
 import kotlinx.coroutines.delay
 
+// Sin Navigation-Compose todavía: "ver equipos"/"ver pagos" son un
+// segundo nivel dentro de Inicio, controlado con este estado local en
+// vez de una pila de navegación de verdad.
+private sealed interface PantallaInterior {
+    data object Lista : PantallaInterior
+    data class VerEquipos(val partidoId: String) : PantallaInterior
+    data class VerPagos(val partidoId: String) : PantallaInterior
+}
+
 // Saludo + próximos partidos (de verdad, contra la API) + cerrar
-// sesión. El resto (equipos, pagos, votaciones, apuestas,
-// estadísticas...) se añade en los siguientes bloques.
+// sesión. El resto (votaciones, apuestas, estadísticas...) se añade en
+// los siguientes bloques.
 @Composable
 fun HomeScreen(
     usuario: Usuario,
     viewModel: HomeViewModel,
     partidosViewModel: PartidosViewModel,
     equiposViewModel: EquiposViewModel,
+    pagosViewModel: PagosViewModel,
     onSesionCerrada: () -> Unit,
 ) {
-    // Sin Navigation-Compose todavía: "ver equipos" es un segundo nivel
-    // dentro de Inicio, controlado con un simple id guardado aquí en
-    // vez de una pila de navegación de verdad.
-    var partidoEquiposId by remember { mutableStateOf<String?>(null) }
+    var pantallaInterior by remember { mutableStateOf<PantallaInterior>(PantallaInterior.Lista) }
 
     // Entrada escalonada: el saludo, luego la lista y luego el botón,
     // cada uno un poco después del anterior, en vez de que aparezca
@@ -78,17 +87,23 @@ fun HomeScreen(
 
         Spacer(Modifier.height(24.dp))
         AnimatedVisibility(visible = mostrarLista, enter = entrada, modifier = Modifier.weight(1f)) {
-            val idActual = partidoEquiposId
-            if (idActual == null) {
-                PartidosScreen(
+            when (val actual = pantallaInterior) {
+                PantallaInterior.Lista -> PartidosScreen(
                     viewModel = partidosViewModel,
-                    onVerEquipos = { partido -> partidoEquiposId = partido.id },
+                    onVerEquipos = { partido -> pantallaInterior = PantallaInterior.VerEquipos(partido.id) },
+                    onVerPagos = { partido -> pantallaInterior = PantallaInterior.VerPagos(partido.id) },
                 )
-            } else {
-                EquiposScreen(
+
+                is PantallaInterior.VerEquipos -> EquiposScreen(
                     viewModel = equiposViewModel,
-                    partidoId = idActual,
-                    onVolver = { partidoEquiposId = null },
+                    partidoId = actual.partidoId,
+                    onVolver = { pantallaInterior = PantallaInterior.Lista },
+                )
+
+                is PantallaInterior.VerPagos -> PagosScreen(
+                    viewModel = pagosViewModel,
+                    partidoId = actual.partidoId,
+                    onVolver = { pantallaInterior = PantallaInterior.Lista },
                 )
             }
         }

@@ -39,7 +39,11 @@ import com.quedadapp.app.ui.theme.Meta
 import com.quedadapp.app.ui.theme.Paper
 
 @Composable
-fun PartidosScreen(viewModel: PartidosViewModel, onVerEquipos: (Partido) -> Unit) {
+fun PartidosScreen(
+    viewModel: PartidosViewModel,
+    onVerEquipos: (Partido) -> Unit,
+    onVerPagos: (Partido) -> Unit,
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text("Próximos partidos", style = MaterialTheme.typography.titleLarge, color = Ink)
         Spacer(Modifier.height(16.dp))
@@ -82,6 +86,7 @@ fun PartidosScreen(viewModel: PartidosViewModel, onVerEquipos: (Partido) -> Unit
                             enProceso = viewModel.idsEnProceso.contains(partido.id),
                             onAlternarAsistencia = { viewModel.alternarAsistencia(partido) },
                             onVerEquipos = { onVerEquipos(partido) },
+                            onVerPagos = { onVerPagos(partido) },
                         )
                     }
                 }
@@ -96,6 +101,7 @@ private fun TarjetaPartido(
     enProceso: Boolean,
     onAlternarAsistencia: () -> Unit,
     onVerEquipos: () -> Unit,
+    onVerPagos: () -> Unit,
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Paper),
@@ -153,10 +159,14 @@ private fun TarjetaPartido(
                 )
             }
 
-            if (partido.tieneEquipos) {
-                Spacer(Modifier.height(4.dp))
-                TextButton(onClick = onVerEquipos) {
-                    Text("Ver equipos →", color = Ink)
+            Row {
+                if (partido.tieneEquipos) {
+                    TextButton(onClick = onVerEquipos) {
+                        Text("Ver equipos →", color = Ink)
+                    }
+                }
+                TextButton(onClick = onVerPagos) {
+                    Text("Ver pagos →", color = Ink)
                 }
             }
         }

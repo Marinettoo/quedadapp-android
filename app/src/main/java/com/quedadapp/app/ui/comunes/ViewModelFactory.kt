@@ -3,10 +3,12 @@ package com.quedadapp.app.ui.comunes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.quedadapp.app.data.AuthRepository
+import com.quedadapp.app.data.PagosRepository
 import com.quedadapp.app.data.PartidosRepository
 import com.quedadapp.app.ui.home.HomeViewModel
 import com.quedadapp.app.ui.login.LoginViewModel
 import com.quedadapp.app.ui.partidos.EquiposViewModel
+import com.quedadapp.app.ui.partidos.PagosViewModel
 import com.quedadapp.app.ui.partidos.PartidosViewModel
 import com.quedadapp.app.ui.registro.RegistroViewModel
 
@@ -16,6 +18,7 @@ import com.quedadapp.app.ui.registro.RegistroViewModel
 class ViewModelFactory(
     private val authRepository: AuthRepository,
     private val partidosRepository: PartidosRepository,
+    private val pagosRepository: PagosRepository,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T = when (modelClass) {
@@ -24,6 +27,7 @@ class ViewModelFactory(
         HomeViewModel::class.java -> HomeViewModel(authRepository) as T
         PartidosViewModel::class.java -> PartidosViewModel(partidosRepository) as T
         EquiposViewModel::class.java -> EquiposViewModel(partidosRepository) as T
+        PagosViewModel::class.java -> PagosViewModel(pagosRepository) as T
         else -> throw IllegalArgumentException("ViewModel desconocido: $modelClass")
     }
 }
