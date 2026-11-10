@@ -11,6 +11,9 @@ interface PartidosApi {
     @GET("api/v1/partidos")
     suspend fun listar(@Header("Authorization") autorizacion: String): Response<PartidosResponse>
 
+    @GET("api/v1/partidos/{id}/equipos")
+    suspend fun equipos(@Header("Authorization") autorizacion: String, @Path("id") id: String): Response<EquiposResponse>
+
     @POST("api/v1/partidos/{id}/asistencia")
     suspend fun apuntarse(@Header("Authorization") autorizacion: String, @Path("id") id: String): Response<Unit>
 

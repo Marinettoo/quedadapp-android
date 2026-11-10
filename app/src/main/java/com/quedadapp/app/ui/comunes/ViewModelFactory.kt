@@ -6,6 +6,7 @@ import com.quedadapp.app.data.AuthRepository
 import com.quedadapp.app.data.PartidosRepository
 import com.quedadapp.app.ui.home.HomeViewModel
 import com.quedadapp.app.ui.login.LoginViewModel
+import com.quedadapp.app.ui.partidos.EquiposViewModel
 import com.quedadapp.app.ui.partidos.PartidosViewModel
 import com.quedadapp.app.ui.registro.RegistroViewModel
 
@@ -22,6 +23,7 @@ class ViewModelFactory(
         RegistroViewModel::class.java -> RegistroViewModel(authRepository) as T
         HomeViewModel::class.java -> HomeViewModel(authRepository) as T
         PartidosViewModel::class.java -> PartidosViewModel(partidosRepository) as T
+        EquiposViewModel::class.java -> EquiposViewModel(partidosRepository) as T
         else -> throw IllegalArgumentException("ViewModel desconocido: $modelClass")
     }
 }

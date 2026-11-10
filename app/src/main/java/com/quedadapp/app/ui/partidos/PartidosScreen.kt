@@ -26,6 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +39,7 @@ import com.quedadapp.app.ui.theme.Meta
 import com.quedadapp.app.ui.theme.Paper
 
 @Composable
-fun PartidosScreen(viewModel: PartidosViewModel) {
+fun PartidosScreen(viewModel: PartidosViewModel, onVerEquipos: (Partido) -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text("Próximos partidos", style = MaterialTheme.typography.titleLarge, color = Ink)
         Spacer(Modifier.height(16.dp))
@@ -80,6 +81,7 @@ fun PartidosScreen(viewModel: PartidosViewModel) {
                             partido = partido,
                             enProceso = viewModel.idsEnProceso.contains(partido.id),
                             onAlternarAsistencia = { viewModel.alternarAsistencia(partido) },
+                            onVerEquipos = { onVerEquipos(partido) },
                         )
                     }
                 }
@@ -93,6 +95,7 @@ private fun TarjetaPartido(
     partido: Partido,
     enProceso: Boolean,
     onAlternarAsistencia: () -> Unit,
+    onVerEquipos: () -> Unit,
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Paper),
@@ -148,6 +151,13 @@ private fun TarjetaPartido(
                     style = MaterialTheme.typography.bodyMedium,
                     color = Meta,
                 )
+            }
+
+            if (partido.tieneEquipos) {
+                Spacer(Modifier.height(4.dp))
+                TextButton(onClick = onVerEquipos) {
+                    Text("Ver equipos →", color = Ink)
+                }
             }
         }
     }

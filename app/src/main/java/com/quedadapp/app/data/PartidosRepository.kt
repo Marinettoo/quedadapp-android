@@ -14,6 +14,16 @@ class PartidosRepository(private val tokenStore: TokenStore) {
         Result.success(respuesta.body()?.partidos ?: emptyList())
     }
 
+    suspend fun equipos(partidoId: String): Result<DatosEquipos> = llamarApi {
+        val auth = autorizacion() ?: return@llamarApi Result.failure(Exception("No has iniciado sesión."))
+        val respuesta = api.equipos(auth, partidoId)
+        if (!respuesta.isSuccessful) {
+            return@llamarApi Result.failure(Exception(ApiClient.mensajeDeError(respuesta)))
+        }
+        val cuerpo = respuesta.body() ?: return@llamarApi Result.failure(Exception("Respuesta vacía del servidor."))
+        Result.success(cuerpo.equipos)
+    }
+
     suspend fun apuntarse(partidoId: String): Result<Unit> = llamarApi {
         val auth = autorizacion() ?: return@llamarApi Result.failure(Exception("No has iniciado sesión."))
         val respuesta = api.apuntarse(auth, partidoId)

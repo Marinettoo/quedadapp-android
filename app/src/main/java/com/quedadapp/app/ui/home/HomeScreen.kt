@@ -23,6 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.quedadapp.app.data.Usuario
+import com.quedadapp.app.ui.partidos.EquiposScreen
+import com.quedadapp.app.ui.partidos.EquiposViewModel
 import com.quedadapp.app.ui.partidos.PartidosScreen
 import com.quedadapp.app.ui.partidos.PartidosViewModel
 import com.quedadapp.app.ui.theme.Ink
@@ -37,8 +39,14 @@ fun HomeScreen(
     usuario: Usuario,
     viewModel: HomeViewModel,
     partidosViewModel: PartidosViewModel,
+    equiposViewModel: EquiposViewModel,
     onSesionCerrada: () -> Unit,
 ) {
+    // Sin Navigation-Compose todavía: "ver equipos" es un segundo nivel
+    // dentro de Inicio, controlado con un simple id guardado aquí en
+    // vez de una pila de navegación de verdad.
+    var partidoEquiposId by remember { mutableStateOf<String?>(null) }
+
     // Entrada escalonada: el saludo, luego la lista y luego el botón,
     // cada uno un poco después del anterior, en vez de que aparezca
     // todo el bloque de golpe.
@@ -70,7 +78,19 @@ fun HomeScreen(
 
         Spacer(Modifier.height(24.dp))
         AnimatedVisibility(visible = mostrarLista, enter = entrada, modifier = Modifier.weight(1f)) {
-            PartidosScreen(viewModel = partidosViewModel)
+            val idActual = partidoEquiposId
+            if (idActual == null) {
+                PartidosScreen(
+                    viewModel = partidosViewModel,
+                    onVerEquipos = { partido -> partidoEquiposId = partido.id },
+                )
+            } else {
+                EquiposScreen(
+                    viewModel = equiposViewModel,
+                    partidoId = idActual,
+                    onVolver = { partidoEquiposId = null },
+                )
+            }
         }
 
         Spacer(Modifier.height(16.dp))

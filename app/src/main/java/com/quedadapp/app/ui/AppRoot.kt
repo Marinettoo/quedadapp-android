@@ -27,6 +27,7 @@ import com.quedadapp.app.ui.home.HomeScreen
 import com.quedadapp.app.ui.home.HomeViewModel
 import com.quedadapp.app.ui.login.LoginScreen
 import com.quedadapp.app.ui.login.LoginViewModel
+import com.quedadapp.app.ui.partidos.EquiposViewModel
 import com.quedadapp.app.ui.partidos.PartidosViewModel
 import com.quedadapp.app.ui.registro.RegistroEnviadoScreen
 import com.quedadapp.app.ui.registro.RegistroScreen
@@ -95,10 +96,12 @@ fun AppRoot(authRepository: AuthRepository, partidosRepository: PartidosReposito
             is PantallaRaiz.Inicio -> {
                 val viewModel: HomeViewModel = viewModel(factory = factory)
                 val partidosViewModel: PartidosViewModel = viewModel(factory = factory)
+                val equiposViewModel: EquiposViewModel = viewModel(factory = factory)
                 HomeScreen(
                     usuario = pantallaActual.usuario,
                     viewModel = viewModel,
                     partidosViewModel = partidosViewModel,
+                    equiposViewModel = equiposViewModel,
                     onSesionCerrada = { pantalla = PantallaRaiz.Login },
                 )
             }
