@@ -18,18 +18,14 @@ android {
     }
 
     buildTypes {
-        // Mismo dominio que producción en las dos variantes (para que el
-        // certificado HTTPS cuadre); en depuración, DEBUG_HOST_IP hace
-        // que ese dominio se resuelva a la IP del servidor en la red
-        // local en vez de salir a internet (ver data/ApiClient.kt). Si
-        // esa IP cambia, solo hay que actualizarla aquí.
+        // Mismo servidor en producción en las dos variantes: sale a
+        // internet y conecta por el dominio público, igual que cualquier
+        // usuario fuera de casa. Nada de IPs locales ni trucos de DNS.
         debug {
             buildConfigField("String", "API_BASE_URL", "\"https://furbo.marinettoo.es/\"")
-            buildConfigField("String", "DEBUG_HOST_IP", "\"192.168.1.43\"")
         }
         release {
             buildConfigField("String", "API_BASE_URL", "\"https://furbo.marinettoo.es/\"")
-            buildConfigField("String", "DEBUG_HOST_IP", "\"\"")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
