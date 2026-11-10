@@ -1,5 +1,9 @@
 package com.quedadapp.app.ui.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,11 +14,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.quedadapp.app.data.Usuario
 import com.quedadapp.app.ui.theme.Ink
 import com.quedadapp.app.ui.theme.Meta
+import kotlinx.coroutines.delay
 
 // Pantalla de inicio todavía mínima: solo confirma que el login y la
 // sesión guardada funcionan de punta a punta. El resto (próximos
@@ -26,29 +36,53 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onSesionCerrada: () -> Unit,
 ) {
+    // Entrada escalonada: el saludo, luego el texto y luego el botón,
+    // cada uno un poco después del anterior, en vez de que aparezca
+    // todo el bloque de golpe.
+    var mostrarSaludo by remember { mutableStateOf(false) }
+    var mostrarTexto by remember { mutableStateOf(false) }
+    var mostrarBoton by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        mostrarSaludo = true
+        delay(90)
+        mostrarTexto = true
+        delay(90)
+        mostrarBoton = true
+    }
+
+    val entrada = fadeIn(tween(350)) + slideInVertically(tween(350)) { alto -> alto / 5 }
+
     Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
-        Text("Hola, ${usuario.nombreUsuario}", style = MaterialTheme.typography.titleLarge, color = Ink)
-        Spacer(Modifier.height(4.dp))
-        Text(
-            if (usuario.rol == "ADMIN") "Administrador" else "Jugador",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Meta,
-        )
+        AnimatedVisibility(visible = mostrarSaludo, enter = entrada) {
+            Column {
+                Text("Hola, ${usuario.nombreUsuario}", style = MaterialTheme.typography.titleLarge, color = Ink)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    if (usuario.rol == "ADMIN") "Administrador" else "Jugador",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Meta,
+                )
+            }
+        }
 
         Spacer(Modifier.height(32.dp))
-        Text(
-            "Próximos partidos, asistencia, equipos y pagos llegarán en próximas versiones.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Meta,
-        )
+        AnimatedVisibility(visible = mostrarTexto, enter = entrada) {
+            Text(
+                "Próximos partidos, asistencia, equipos y pagos llegarán en próximas versiones.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Meta,
+            )
+        }
 
         Spacer(Modifier.height(32.dp))
-        TextButton(
-            onClick = { viewModel.cerrarSesion(onSesionCerrada) },
-            enabled = !viewModel.cerrandoSesion,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text("Cerrar sesión", color = Meta)
+        AnimatedVisibility(visible = mostrarBoton, enter = entrada) {
+            TextButton(
+                onClick = { viewModel.cerrarSesion(onSesionCerrada) },
+                enabled = !viewModel.cerrandoSesion,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Cerrar sesión", color = Meta)
+            }
         }
     }
 }

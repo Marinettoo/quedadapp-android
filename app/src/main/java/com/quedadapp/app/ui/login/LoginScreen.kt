@@ -1,5 +1,13 @@
 package com.quedadapp.app.ui.login
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,28 +16,31 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.quedadapp.app.data.Usuario
+import com.quedadapp.app.ui.comunes.BotonPrincipal
 import com.quedadapp.app.ui.theme.Ink
 import com.quedadapp.app.ui.theme.Lime
 import com.quedadapp.app.ui.theme.Meta
-import com.quedadapp.app.ui.theme.Paper
 
 @Composable
 fun LoginScreen(
@@ -37,10 +48,23 @@ fun LoginScreen(
     onLoginExitoso: (Usuario) -> Unit,
     onIrARegistro: () -> Unit,
 ) {
+    // El titular del bloque lima entra con un pequeño deslizamiento +
+    // desvanecido al abrir la pantalla, en vez de aparecer de golpe —
+    // el equivalente animado al "login cinematográfico" de la web.
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+    val alphaTitular by animateFloatAsState(if (visible) 1f else 0f, tween(550), label = "alphaTitularLogin")
+    val desplazamientoTitular by animateDpAsState(if (visible) 0.dp else 20.dp, tween(550), label = "offsetTitularLogin")
+
+    // El mensaje de error se queda visible durante la animación de
+    // salida aunque el ViewModel ya lo haya puesto a null (si no, el
+    // texto desaparecería de golpe a mitad de la animación).
+    var ultimoError by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(viewModel.error) {
+        if (viewModel.error != null) ultimoError = viewModel.error
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
-        // Bloque de marca (lima), como el "login cinematográfico" de la
-        // web: lo expresivo va arriba, el formulario abajo es lo
-        // funcional. Versión simplificada por ahora, sin la ilustración.
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -48,7 +72,12 @@ fun LoginScreen(
                 .background(Lime),
             contentAlignment = Alignment.BottomStart,
         ) {
-            Column(modifier = Modifier.padding(24.dp)) {
+            Column(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .offset(y = desplazamientoTitular)
+                    .alpha(alphaTitular),
+            ) {
                 Text("Quedadapp", style = MaterialTheme.typography.labelLarge, color = Ink)
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -87,24 +116,28 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            viewModel.error?.let { mensaje ->
-                Spacer(Modifier.height(12.dp))
-                Text(mensaje, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+            AnimatedVisibility(
+                visible = viewModel.error != null,
+                enter = fadeIn(tween(200)) + expandVertically(tween(200)),
+                exit = fadeOut(tween(150)) + shrinkVertically(tween(150)),
+            ) {
+                Column {
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        ultimoError ?: "",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
             }
 
             Spacer(Modifier.height(20.dp))
-            Button(
+            BotonPrincipal(
+                texto = "Entrar",
+                cargando = viewModel.cargando,
                 onClick = { viewModel.iniciarSesion(onLoginExitoso) },
-                enabled = !viewModel.cargando,
-                colors = ButtonDefaults.buttonColors(containerColor = Ink, contentColor = Paper),
                 modifier = Modifier.fillMaxWidth(),
-            ) {
-                if (viewModel.cargando) {
-                    CircularProgressIndicator(modifier = Modifier.size(18.dp), color = Paper)
-                } else {
-                    Text("Entrar")
-                }
-            }
+            )
 
             Spacer(Modifier.height(12.dp))
             TextButton(onClick = onIrARegistro, modifier = Modifier.fillMaxWidth()) {

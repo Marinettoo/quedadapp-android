@@ -1,5 +1,11 @@
 package com.quedadapp.app.ui.registro
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,20 +13,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.quedadapp.app.ui.comunes.BotonPrincipal
 import com.quedadapp.app.ui.theme.Ink
 import com.quedadapp.app.ui.theme.Meta
-import com.quedadapp.app.ui.theme.Paper
 
 @Composable
 fun RegistroScreen(
@@ -28,6 +37,13 @@ fun RegistroScreen(
     onRegistroEnviado: () -> Unit,
     onVolverALogin: () -> Unit,
 ) {
+    // Igual que en Login: se guarda el último mensaje para que no
+    // desaparezca de golpe a mitad de la animación de salida.
+    var ultimoError by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(viewModel.error) {
+        if (viewModel.error != null) ultimoError = viewModel.error
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,20 +95,28 @@ fun RegistroScreen(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        viewModel.error?.let { mensaje ->
-            Spacer(Modifier.height(12.dp))
-            Text(mensaje, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+        AnimatedVisibility(
+            visible = viewModel.error != null,
+            enter = fadeIn(tween(200)) + expandVertically(tween(200)),
+            exit = fadeOut(tween(150)) + shrinkVertically(tween(150)),
+        ) {
+            Column {
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    ultimoError ?: "",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
         }
 
         Spacer(Modifier.height(20.dp))
-        Button(
+        BotonPrincipal(
+            texto = "Crear cuenta",
+            cargando = viewModel.cargando,
             onClick = { viewModel.registrar(onRegistroEnviado) },
-            enabled = !viewModel.cargando,
-            colors = ButtonDefaults.buttonColors(containerColor = Ink, contentColor = Paper),
             modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(if (viewModel.cargando) "Enviando…" else "Crear cuenta")
-        }
+        )
 
         Spacer(Modifier.height(12.dp))
         TextButton(onClick = onVolverALogin, modifier = Modifier.fillMaxWidth()) {

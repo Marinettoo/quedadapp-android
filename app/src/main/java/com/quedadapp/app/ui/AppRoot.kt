@@ -1,5 +1,12 @@
 package com.quedadapp.app.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -49,36 +56,48 @@ fun AppRoot(authRepository: AuthRepository) {
 
     val factory = remember { ViewModelFactory(authRepository) }
 
-    when (val actual = pantalla) {
-        PantallaRaiz.Cargando -> CargandoScreen()
+    // Un deslizamiento + desvanecido entre pantallas en vez de un corte
+    // seco: la que entra viene desde la derecha, la que sale se desliza
+    // un poco a la izquierda mientras se desvanece.
+    AnimatedContent(
+        targetState = pantalla,
+        transitionSpec = {
+            (slideInHorizontally(animationSpec = tween(320)) { ancho -> ancho / 4 } + fadeIn(tween(320)))
+                .togetherWith(slideOutHorizontally(animationSpec = tween(220)) { ancho -> -ancho / 8 } + fadeOut(tween(180)))
+        },
+        label = "pantallaRaiz",
+    ) { pantallaActual ->
+        when (pantallaActual) {
+            PantallaRaiz.Cargando -> CargandoScreen()
 
-        PantallaRaiz.Login -> {
-            val viewModel: LoginViewModel = viewModel(factory = factory)
-            LoginScreen(
-                viewModel = viewModel,
-                onLoginExitoso = { pantalla = PantallaRaiz.Inicio(it) },
-                onIrARegistro = { pantalla = PantallaRaiz.Registro },
-            )
-        }
+            PantallaRaiz.Login -> {
+                val viewModel: LoginViewModel = viewModel(factory = factory)
+                LoginScreen(
+                    viewModel = viewModel,
+                    onLoginExitoso = { pantalla = PantallaRaiz.Inicio(it) },
+                    onIrARegistro = { pantalla = PantallaRaiz.Registro },
+                )
+            }
 
-        PantallaRaiz.Registro -> {
-            val viewModel: RegistroViewModel = viewModel(factory = factory)
-            RegistroScreen(
-                viewModel = viewModel,
-                onRegistroEnviado = { pantalla = PantallaRaiz.RegistroEnviado },
-                onVolverALogin = { pantalla = PantallaRaiz.Login },
-            )
-        }
+            PantallaRaiz.Registro -> {
+                val viewModel: RegistroViewModel = viewModel(factory = factory)
+                RegistroScreen(
+                    viewModel = viewModel,
+                    onRegistroEnviado = { pantalla = PantallaRaiz.RegistroEnviado },
+                    onVolverALogin = { pantalla = PantallaRaiz.Login },
+                )
+            }
 
-        PantallaRaiz.RegistroEnviado -> RegistroEnviadoScreen(onVolverALogin = { pantalla = PantallaRaiz.Login })
+            PantallaRaiz.RegistroEnviado -> RegistroEnviadoScreen(onVolverALogin = { pantalla = PantallaRaiz.Login })
 
-        is PantallaRaiz.Inicio -> {
-            val viewModel: HomeViewModel = viewModel(factory = factory)
-            HomeScreen(
-                usuario = actual.usuario,
-                viewModel = viewModel,
-                onSesionCerrada = { pantalla = PantallaRaiz.Login },
-            )
+            is PantallaRaiz.Inicio -> {
+                val viewModel: HomeViewModel = viewModel(factory = factory)
+                HomeScreen(
+                    usuario = pantallaActual.usuario,
+                    viewModel = viewModel,
+                    onSesionCerrada = { pantalla = PantallaRaiz.Login },
+                )
+            }
         }
     }
 }
