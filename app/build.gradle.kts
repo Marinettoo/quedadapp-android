@@ -18,16 +18,18 @@ android {
     }
 
     buildTypes {
-        // El servidor de desarrollo (npm run dev) corre en el Mac, no en
-        // esta torre Windows, así que 10.0.2.2 (alias del emulador para
-        // "el propio localhost de la máquina del emulador") no sirve
-        // aquí: hay que apuntar a la IP del Mac en la red local. Si esa
-        // IP cambia (otra red/Wi-Fi), hay que actualizarla.
+        // Mismo dominio que producción en las dos variantes (para que el
+        // certificado HTTPS cuadre); en depuración, DEBUG_HOST_IP hace
+        // que ese dominio se resuelva a la IP del servidor en la red
+        // local en vez de salir a internet (ver data/ApiClient.kt). Si
+        // esa IP cambia, solo hay que actualizarla aquí.
         debug {
-            buildConfigField("String", "API_BASE_URL", "\"http://192.168.1.26:3000/\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://furbo.marinettoo.es/\"")
+            buildConfigField("String", "DEBUG_HOST_IP", "\"192.168.1.43\"")
         }
         release {
             buildConfigField("String", "API_BASE_URL", "\"https://furbo.marinettoo.es/\"")
+            buildConfigField("String", "DEBUG_HOST_IP", "\"\"")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
