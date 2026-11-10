@@ -20,12 +20,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quedadapp.app.data.AuthRepository
+import com.quedadapp.app.data.JugadoresRepository
 import com.quedadapp.app.data.PagosRepository
 import com.quedadapp.app.data.PartidosRepository
 import com.quedadapp.app.data.Usuario
 import com.quedadapp.app.ui.comunes.ViewModelFactory
 import com.quedadapp.app.ui.home.HomeScreen
 import com.quedadapp.app.ui.home.HomeViewModel
+import com.quedadapp.app.ui.jugadores.JugadoresScreen
+import com.quedadapp.app.ui.jugadores.JugadoresViewModel
 import com.quedadapp.app.ui.login.LoginScreen
 import com.quedadapp.app.ui.login.LoginViewModel
 import com.quedadapp.app.ui.partidos.EquiposViewModel
@@ -36,16 +39,17 @@ import com.quedadapp.app.ui.registro.RegistroScreen
 import com.quedadapp.app.ui.registro.RegistroViewModel
 import com.quedadapp.app.ui.theme.Ink
 
-// Sin Navigation-Compose todavía: con cuatro pantallas en fila (login,
-// registro, registro enviado, inicio) basta un estado simple. Cuando
-// lleguen las pantallas de partidos/equipos/pagos con su propia
-// navegación en profundidad, este es el sitio donde introducirlo.
+// Sin Navigation-Compose todavía: con cinco pantallas en fila (login,
+// registro, registro enviado, inicio, jugadores) basta un estado
+// simple. Cuando la navegación crezca más, este es el sitio donde
+// introducir Navigation-Compose de verdad.
 private sealed interface PantallaRaiz {
     data object Cargando : PantallaRaiz
     data object Login : PantallaRaiz
     data object Registro : PantallaRaiz
     data object RegistroEnviado : PantallaRaiz
     data class Inicio(val usuario: Usuario) : PantallaRaiz
+    data class Jugadores(val usuario: Usuario) : PantallaRaiz
 }
 
 @Composable
@@ -53,6 +57,7 @@ fun AppRoot(
     authRepository: AuthRepository,
     partidosRepository: PartidosRepository,
     pagosRepository: PagosRepository,
+    jugadoresRepository: JugadoresRepository,
 ) {
     var pantalla by remember { mutableStateOf<PantallaRaiz>(PantallaRaiz.Cargando) }
 
@@ -63,7 +68,9 @@ fun AppRoot(
         pantalla = if (usuario != null) PantallaRaiz.Inicio(usuario) else PantallaRaiz.Login
     }
 
-    val factory = remember { ViewModelFactory(authRepository, partidosRepository, pagosRepository) }
+    val factory = remember {
+        ViewModelFactory(authRepository, partidosRepository, pagosRepository, jugadoresRepository)
+    }
 
     // Un deslizamiento + desvanecido entre pantallas en vez de un corte
     // seco: la que entra viene desde la derecha, la que sale se desliza
@@ -111,6 +118,15 @@ fun AppRoot(
                     equiposViewModel = equiposViewModel,
                     pagosViewModel = pagosViewModel,
                     onSesionCerrada = { pantalla = PantallaRaiz.Login },
+                    onVerJugadores = { pantalla = PantallaRaiz.Jugadores(pantallaActual.usuario) },
+                )
+            }
+
+            is PantallaRaiz.Jugadores -> {
+                val viewModel: JugadoresViewModel = viewModel(factory = factory)
+                JugadoresScreen(
+                    viewModel = viewModel,
+                    onVolver = { pantalla = PantallaRaiz.Inicio(pantallaActual.usuario) },
                 )
             }
         }

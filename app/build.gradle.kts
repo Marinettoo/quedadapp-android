@@ -70,5 +70,9 @@ dependencies {
     // SharedPreferences normal, que no cifra nada).
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
+    // Cargar la foto de perfil (/fotos/{id}) con la cabecera
+    // Authorization, igual que el resto de peticiones a la API.
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
     debugImplementation("androidx.compose.ui:ui-tooling")
 }

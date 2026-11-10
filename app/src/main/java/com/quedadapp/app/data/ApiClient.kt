@@ -32,6 +32,7 @@ object ApiClient {
     val authApi: AuthApi = retrofit.create(AuthApi::class.java)
     val partidosApi: PartidosApi = retrofit.create(PartidosApi::class.java)
     val pagosApi: PagosApi = retrofit.create(PagosApi::class.java)
+    val jugadoresApi: JugadoresApi = retrofit.create(JugadoresApi::class.java)
 
     // Las rutas de error de la API devuelven {"error": "..."} con un
     // código distinto de 2xx; Retrofit no las convierte solas, hay que

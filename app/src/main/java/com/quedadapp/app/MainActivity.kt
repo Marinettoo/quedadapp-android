@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             QuedadappTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = Paper) {
-                    AppRoot(app.authRepository, app.partidosRepository, app.pagosRepository)
+                    AppRoot(app.authRepository, app.partidosRepository, app.pagosRepository, app.jugadoresRepository)
                 }
             }
         }

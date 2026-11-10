@@ -2,6 +2,7 @@ package com.quedadapp.app
 
 import android.app.Application
 import com.quedadapp.app.data.AuthRepository
+import com.quedadapp.app.data.JugadoresRepository
 import com.quedadapp.app.data.PagosRepository
 import com.quedadapp.app.data.PartidosRepository
 import com.quedadapp.app.data.TokenStore
@@ -17,6 +18,8 @@ class QuedadappApp : Application() {
         private set
     lateinit var pagosRepository: PagosRepository
         private set
+    lateinit var jugadoresRepository: JugadoresRepository
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -24,5 +27,6 @@ class QuedadappApp : Application() {
         authRepository = AuthRepository(tokenStore)
         partidosRepository = PartidosRepository(tokenStore)
         pagosRepository = PagosRepository(tokenStore)
+        jugadoresRepository = JugadoresRepository(tokenStore)
     }
 }

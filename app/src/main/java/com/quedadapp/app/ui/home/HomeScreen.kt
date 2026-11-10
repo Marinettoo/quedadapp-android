@@ -53,6 +53,7 @@ fun HomeScreen(
     equiposViewModel: EquiposViewModel,
     pagosViewModel: PagosViewModel,
     onSesionCerrada: () -> Unit,
+    onVerJugadores: () -> Unit,
 ) {
     var pantallaInterior by remember { mutableStateOf<PantallaInterior>(PantallaInterior.Lista) }
 
@@ -82,10 +83,14 @@ fun HomeScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = Meta,
                 )
+                Spacer(Modifier.height(8.dp))
+                TextButton(onClick = onVerJugadores) {
+                    Text("Ver jugadores →", color = Ink)
+                }
             }
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(16.dp))
         AnimatedVisibility(visible = mostrarLista, enter = entrada, modifier = Modifier.weight(1f)) {
             when (val actual = pantallaInterior) {
                 PantallaInterior.Lista -> PartidosScreen(
